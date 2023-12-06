@@ -1,14 +1,15 @@
-import './assets/main.css'
+import "./assets/main.css";
+import { plugin, defaultConfig } from "@formkit/vue";
+import { createApp } from "vue";
+import { createPinia } from "pinia";
+import config from "../formkit.config";
+import App from "./App.vue";
+import router from "./router";
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+const app = createApp(App);
 
-import App from './App.vue'
-import router from './router'
+app.use(createPinia());
+app.use(router);
+app.use(plugin, defaultConfig(config));
 
-const app = createApp(App)
-
-app.use(createPinia())
-app.use(router)
-
-app.mount('#app')
+app.mount("#app");
