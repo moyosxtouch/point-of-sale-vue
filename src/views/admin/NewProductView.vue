@@ -1,8 +1,31 @@
 <script setup>
+import { reactive } from "vue";
 import Link from "@/components/Link.vue";
 import useImage from "@/composables/useImage";
-
+import { useProductsStore } from "../../stores/products";
+import { useRouter } from "vue-router";
+const router = useRouter();
 const { onFileChange, url, isImageUploaded } = useImage();
+const products = useProductsStore();
+const formData = reactive({
+  name: "",
+  category: "",
+  price: "",
+  availability: "",
+  image: "",
+});
+const submitHandler = async (data) => {
+  const { image, ...values } = data;
+  try {
+    await products.createProduct({
+      ...values,
+      image: url.value,
+    });
+    router.push({ name: "products" });
+  } catch (error) {
+    console.log(error);
+  }
+};
 </script>
 
 <template>
@@ -15,6 +38,8 @@ const { onFileChange, url, isImageUploaded } = useImage();
           type="form"
           submit-label="Agregar Producto"
           incomplete-message="No se pudo enviar, revisa los mensajes"
+          @submit="submitHandler"
+          :value="formData"
         >
           <FormKit
             type="text"
@@ -25,6 +50,7 @@ const { onFileChange, url, isImageUploaded } = useImage();
             :validation-messages="{
               required: 'El Nombre del Producto es Obligatorio',
             }"
+            v-model.trim="formData.name"
           />
           <FormKit
             type="file"
@@ -36,6 +62,7 @@ const { onFileChange, url, isImageUploaded } = useImage();
             }"
             accept=".jpg"
             @change="onFileChange"
+            v-model.trim="formData.image"
           />
           <div v-if="isImageUploaded">
             <p class="font-black">Imagen Producto:</p>
@@ -49,7 +76,8 @@ const { onFileChange, url, isImageUploaded } = useImage();
             :validation-messages="{
               required: 'La Categoria  es Obligatoria',
             }"
-            :options="[1, 2, 3]"
+            :options="products.categoryOptions"
+            v-model.number="formData.category"
           />
           <FormKit
             type="number"
@@ -60,6 +88,7 @@ const { onFileChange, url, isImageUploaded } = useImage();
               required: 'El Precio del Producto es Obligatorio',
             }"
             min="1"
+            v-model.number="formData.price"
           />
           <FormKit
             type="number"
@@ -71,6 +100,7 @@ const { onFileChange, url, isImageUploaded } = useImage();
               required: 'La cantidad es obligatoria',
             }"
             min="1"
+            v-model.number="formData.availability"
           />
         </FormKit>
       </div>
