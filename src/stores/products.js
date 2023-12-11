@@ -1,4 +1,4 @@
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 import { defineStore } from "pinia";
 import { useFirestore, useCollection, useFirebaseStorage } from "vuefire";
@@ -18,7 +18,7 @@ import {
 export const useProductsStore = defineStore("products", () => {
   const db = useFirestore();
   const storage = useFirebaseStorage();
-
+  const selectedCategory = ref(1);
   const categories = [
     { id: 1, name: "Sudaderas" },
     { id: 2, name: "Tenis" },
@@ -60,6 +60,11 @@ export const useProductsStore = defineStore("products", () => {
     return options;
   });
   const noResults = computed(() => productsCollection.value.length === 0);
+  const filteredProducts = computed(() => {
+    return productsCollection.value.filter(
+      (product) => product.category === selectedCategory.value
+    );
+  });
   return {
     createProduct,
     updateProduct,
@@ -67,5 +72,8 @@ export const useProductsStore = defineStore("products", () => {
     productsCollection,
     categoryOptions,
     noResults,
+    filteredProducts,
+    categories,
+    selectedCategory,
   };
 });
