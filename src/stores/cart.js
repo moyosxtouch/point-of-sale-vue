@@ -18,13 +18,20 @@ export const useCartStore = defineStore("cart", () => {
   });
 
   function addItem(item) {
-    items.value.push({ ...item, quantity: 1, id: item.id });
+    const index = isItemInCart(item.id);
+    if (index >= 0) {
+      //Actualizar la cantidad
+      items.value[index].quantity++;
+    } else {
+      items.value.push({ ...item, quantity: 1, id: item.id });
+    }
   }
   function updateQuantity(id, quantity) {
     items.value = items.value.map((item) =>
       item.id === id ? { ...item, quantity } : item
     );
   }
+  const isItemInCart = (id) => items.value.findIndex((item) => item.id === id);
   const isEmpty = computed(() => items.value.length === 0);
   const checkProductAvailability = computed(() => {
     return (product) =>
